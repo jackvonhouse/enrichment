@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  database:
+    image: postgres:latest
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: enrichment-admin
+      POSTGRES_PASSWORD: enrichment-admin-password
+      POSTGRES_DB: enrichment

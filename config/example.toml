@@ -1,0 +1,14 @@
+[server]
+
+[server.http]
+port = 8081
+
+[database]
+
+[database.postgres]
+host = "127.0.0.1"
+port = 5432
+username = "enrichment-admin"
+password = "enrichment-admin-password"
+database_name = "enrichment"
+ssl_mode = "disable"

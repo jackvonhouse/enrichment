@@ -10,6 +10,8 @@ func Response(
 	data interface{},
 ) {
 
+	w.Header().Add("Content-Type", "application/json")
+
 	if err := json.NewEncoder(w).Encode(&data); err != nil {
 		Error(
 			w,
@@ -25,6 +27,7 @@ func Error(
 	message string,
 ) {
 
+	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
 	if message != "" {

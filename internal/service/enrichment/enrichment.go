@@ -87,7 +87,7 @@ func (s Service) Nationalize(name string) (string, error) {
 
 	resp, err := http.Get(s.nationalizeUrl(name))
 	if err != nil {
-		logger.Warnf("can't get from genderize: %s", err)
+		logger.Warnf("can't get from nationalize: %s", err)
 
 		return "", ErrCantNationalize
 	}
@@ -104,13 +104,15 @@ func (s Service) Nationalize(name string) (string, error) {
 	}
 
 	if err := json.NewDecoder(resp.Body).Decode(&data); err != nil {
-		logger.Warnf("can't decode genderize: %s", err)
+		logger.Warnf("can't decode nationalize: %s", err)
 
 		return "", ErrCantNationalize
 	}
 
 	if len(data.Country) == 0 {
-		logger.Warnf("error on genderize: countries length is %d", len(data.Country))
+		logger.Warnf("error on nationalize: countries length is %d", len(data.Country))
+
+		return "", ErrCantNationalize
 	}
 
 	return data.Country[0].CountryID, nil

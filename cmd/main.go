@@ -37,6 +37,8 @@ func main() {
 	app, err := app.New(ctx, config, logger)
 	if err != nil {
 		logger.Error(err)
+
+		return
 	}
 
 	go app.Run()

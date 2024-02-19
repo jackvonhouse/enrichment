@@ -9,9 +9,8 @@ import (
 type repositoryUser interface {
 	Create(context.Context, dto.CreateDTO, dto.EnrichmentDTO) (int, error)
 
-	Get(context.Context, dto.GetDTO) ([]dto.User, error)
+	Get(context.Context, dto.GetDTO, dto.FilterDTO, dto.SortDTO) ([]dto.User, error)
 	GetById(context.Context, int) (dto.User, error)
-	GetByFilter(context.Context, dto.GetDTO, dto.FilterDTO) ([]dto.User, error)
 
 	Update(context.Context, dto.UpdateDTO) (int, error)
 
@@ -46,9 +45,11 @@ func (s Service) Create(
 func (s Service) Get(
 	ctx context.Context,
 	data dto.GetDTO,
+	filter dto.FilterDTO,
+	sort dto.SortDTO,
 ) ([]dto.User, error) {
 
-	return s.repository.Get(ctx, data)
+	return s.repository.Get(ctx, data, filter, sort)
 }
 
 func (s Service) GetById(
@@ -57,15 +58,6 @@ func (s Service) GetById(
 ) (dto.User, error) {
 
 	return s.repository.GetById(ctx, id)
-}
-
-func (s Service) GetByFilter(
-	ctx context.Context,
-	get dto.GetDTO,
-	filter dto.FilterDTO,
-) ([]dto.User, error) {
-
-	return s.repository.GetByFilter(ctx, get, filter)
 }
 
 func (s Service) Update(

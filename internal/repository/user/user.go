@@ -106,20 +106,27 @@ func (r Repository) Create(
 func (r Repository) Get(
 	ctx context.Context,
 	get dto.GetDTO,
+	filter dto.FilterDTO,
+	sort dto.SortDTO,
 ) ([]dto.User, error) {
 
-	query, args, err := sq.
+	sb := sq.
 		Select(
 			"id",
 			"name", "surname", "patronymic",
 			"age", "gender", "country",
 		).
 		From("users").
-		OrderBy("id").
+		OrderBy(
+			fmt.Sprintf("%s %s", sort.SortBy, sort.SortOrder),
+		).
 		Offset(uint64(get.Offset)).
 		Limit(uint64(get.Limit)).
-		PlaceholderFormat(sq.Dollar).
-		ToSql()
+		PlaceholderFormat(sq.Dollar)
+
+	sb = r.where(sb, filter)
+
+	query, args, err := sb.ToSql()
 
 	logger := r.logger.WithFields(map[string]any{
 		"request": map[string]any{
@@ -209,66 +216,6 @@ func (r Repository) GetById(
 	}
 
 	return user, nil
-}
-
-func (r Repository) GetByFilter(
-	ctx context.Context,
-	get dto.GetDTO,
-	filter dto.FilterDTO,
-) ([]dto.User, error) {
-
-	query, args, err := sq.
-		Select(
-			"id",
-			"name", "surname", "patronymic",
-			"age", "gender", "country",
-		).
-		From("users").
-		OrderBy(
-			fmt.Sprintf("%s %s", filter.SortBy, filter.SortOrder),
-		).
-		Offset(uint64(get.Offset)).
-		Limit(uint64(get.Limit)).
-		PlaceholderFormat(sq.Dollar).
-		ToSql()
-
-	logger := r.logger.WithFields(map[string]any{
-		"request": map[string]any{
-			"query": query,
-			"args": map[string]any{
-				"offset":    get.Offset,
-				"limit":     get.Limit,
-				"sortBy":    filter.SortBy,
-				"sortOrder": filter.SortOrder,
-			},
-		},
-	})
-
-	if err != nil {
-		logger.Warnf("error on create sql query: %s", err)
-
-		return []dto.User{}, err
-	}
-
-	users := make([]dto.User, 0)
-
-	if err := r.db.SelectContext(ctx, &users, query, args...); err != nil {
-		logger.Warnf("error on get users: %s", err)
-
-		if !errpkg.Is(err, sql.ErrNoRows) {
-			return []dto.User{}, errors.
-				ErrInternal.
-				New("error on get users").
-				Wrap(err)
-		}
-
-		return []dto.User{}, errors.
-			ErrNotFound.
-			New("user not found").
-			Wrap(err)
-	}
-
-	return users, nil
 }
 
 func (r Repository) Update(

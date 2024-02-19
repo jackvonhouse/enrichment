@@ -15,9 +15,8 @@ import (
 type useCaseUser interface {
 	Create(context.Context, dto.CreateDTO) (int, error)
 
-	Get(context.Context, dto.GetDTO) ([]dto.User, error)
+	Get(context.Context, dto.GetDTO, dto.FilterDTO, dto.SortDTO) ([]dto.User, error)
 	GetById(context.Context, int) (dto.User, error)
-	GetByFilter(context.Context, dto.GetDTO, dto.FilterDTO) ([]dto.User, error)
 
 	Update(context.Context, dto.UpdateDTO) (int, error)
 
@@ -47,11 +46,6 @@ func (t Transport) Handle(
 
 	router.HandleFunc("", t.Create).
 		Methods(http.MethodPost)
-
-	router.HandleFunc("", t.GetByFilter).
-		Methods(http.MethodGet).
-		Queries("sort_by", `{sort_by}`).
-		Queries("sort_order", `{sort_order}`)
 
 	router.HandleFunc("", t.Get).
 		Methods(http.MethodGet)
@@ -118,6 +112,45 @@ func (t Transport) Get(
 
 	queries := r.URL.Query()
 
+	name := queries.Get("name")
+	surname := queries.Get("surname")
+	patronymic := queries.Get("patronymic")
+
+	age, err := transport.StringToInt(queries.Get("age"))
+	if err != nil || age < 0 {
+		age = 0
+	}
+
+	ageSort := queries.Get("age_sort_operator")
+
+	genders := queries["gender"]
+	countries := queries["country"]
+
+	filter := dto.FilterDTO{
+		Name:       name,
+		Surname:    surname,
+		Patronymic: patronymic,
+		Age:        age,
+		AgeSort:    ageSort,
+		Gender:     genders,
+		Country:    countries,
+	}
+
+	sortBy := queries.Get("sort_by")
+	if !transport.IsSortField(sortBy) {
+		sortBy = "id"
+	}
+
+	sortOrder := queries.Get("sort_order")
+	if !transport.IsSortOrder(sortOrder) {
+		sortOrder = "desc"
+	}
+
+	sort := dto.SortDTO{
+		SortBy:    sortBy,
+		SortOrder: sortOrder,
+	}
+
 	limit, err := transport.StringToInt(queries.Get("limit"))
 	if err != nil || limit <= 0 {
 		// В зависимости от логики выбрасывать ошибку
@@ -146,7 +179,7 @@ func (t Transport) Get(
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
 	defer cancel()
 
-	users, err := t.useCase.Get(ctx, data)
+	users, err := t.useCase.Get(ctx, data, filter, sort)
 	if err != nil {
 		t.logger.Warn(err)
 
@@ -181,73 +214,6 @@ func (t Transport) GetById(
 	defer cancel()
 
 	user, err := t.useCase.GetById(ctx, userID)
-	if err != nil {
-		t.logger.Warn(err)
-
-		code, msg := transport.ErrorToHttpResponse(
-			err,
-			transport.DefaultErrorHttpCodes,
-		)
-
-		transport.Error(w, code, msg)
-
-		return
-	}
-
-	transport.Response(w, user)
-}
-
-func (t Transport) GetByFilter(
-	w http.ResponseWriter,
-	r *http.Request,
-) {
-
-	queries := r.URL.Query()
-
-	limit, err := transport.StringToInt(queries.Get("limit"))
-	if err != nil || limit <= 0 {
-		// transport.Error(w, http.StatusBadRequest, "invalid limit")
-		// return
-
-		limit = 10
-	}
-
-	offset, err := transport.StringToInt(queries.Get("offset"))
-	if err != nil || offset < 0 {
-		// transport.Error(w, http.StatusBadRequest, "invalid offset")
-		// return
-
-		offset = 0
-	}
-
-	getData := dto.GetDTO{
-		Limit:  limit,
-		Offset: offset,
-	}
-
-	sortBy := queries.Get("sort_by")
-	if !transport.IsSortField(sortBy) {
-		transport.Error(w, http.StatusBadRequest, "invalid sort_by")
-
-		return
-	}
-
-	sortOrder := queries.Get("sort_order")
-	if !transport.IsSortOrder(sortOrder) {
-		transport.Error(w, http.StatusBadRequest, "invalid sort_order")
-
-		return
-	}
-
-	sortData := dto.FilterDTO{
-		SortBy:    sortBy,
-		SortOrder: sortOrder,
-	}
-
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
-	defer cancel()
-
-	user, err := t.useCase.GetByFilter(ctx, getData, sortData)
 	if err != nil {
 		t.logger.Warn(err)
 

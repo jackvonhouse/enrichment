@@ -32,6 +32,16 @@ type GetDTO struct {
 }
 
 type FilterDTO struct {
+	Name       string
+	Surname    string
+	Patronymic string
+	Age        int
+	AgeSort    string
+	Gender     []string
+	Country    []string
+}
+
+type SortDTO struct {
 	SortBy    string
 	SortOrder string
 }

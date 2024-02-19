@@ -9,9 +9,8 @@ import (
 type serviceUser interface {
 	Create(context.Context, dto.CreateDTO, dto.EnrichmentDTO) (int, error)
 
-	Get(context.Context, dto.GetDTO) ([]dto.User, error)
+	Get(context.Context, dto.GetDTO, dto.FilterDTO, dto.SortDTO) ([]dto.User, error)
 	GetById(context.Context, int) (dto.User, error)
-	GetByFilter(context.Context, dto.GetDTO, dto.FilterDTO) ([]dto.User, error)
 
 	Update(context.Context, dto.UpdateDTO) (int, error)
 
@@ -76,9 +75,11 @@ func (u UseCase) Create(
 func (u UseCase) Get(
 	ctx context.Context,
 	data dto.GetDTO,
+	filter dto.FilterDTO,
+	sort dto.SortDTO,
 ) ([]dto.User, error) {
 
-	return u.service.Get(ctx, data)
+	return u.service.Get(ctx, data, filter, sort)
 }
 
 func (u UseCase) GetById(
@@ -87,15 +88,6 @@ func (u UseCase) GetById(
 ) (dto.User, error) {
 
 	return u.service.GetById(ctx, id)
-}
-
-func (u UseCase) GetByFilter(
-	ctx context.Context,
-	get dto.GetDTO,
-	filter dto.FilterDTO,
-) ([]dto.User, error) {
-
-	return u.service.GetByFilter(ctx, get, filter)
 }
 
 func (u UseCase) Update(

@@ -1,0 +1,56 @@
+type User {
+  id: Int!
+  name: String!
+  surname: String!
+  patronymic: String
+  age: Int
+  gender: String
+  country: String
+}
+
+input CreateInput {
+  name: String!
+  surname: String!
+  patronymic: String
+}
+
+input UpdateInput {
+  id: Int!
+  name: String!
+  surname: String!
+  patronymic: String
+  age: Int!
+  country: String!
+  gender: String!
+}
+
+input FilterInput {
+  name: String
+  surname: String
+  patronymic: String
+  age: Int
+  ageSort: String
+  gender: [String!]
+  country: [String!]
+}
+
+input GetInput {
+  limit: Int
+  offset: Int
+}
+
+input SortInput {
+  sortBy: String
+  sortOrder: String
+}
+
+type Query {
+  get(get: GetInput, filter: FilterInput, sort: SortInput): [User!]!
+  getById(id: Int!): User!
+}
+
+type Mutation {
+  create(input: CreateInput!): Int!
+  update(input: UpdateInput!): Int!
+  delete(id: Int!): Int!
+}

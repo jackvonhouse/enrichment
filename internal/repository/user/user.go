@@ -70,6 +70,8 @@ func (r Repository) Create(
 		return 0, err
 	}
 
+	logger.Info(query)
+
 	var userID int
 
 	if err := r.db.GetContext(ctx, &userID, query, args...); err != nil {
@@ -144,6 +146,8 @@ func (r Repository) Get(
 		return []dto.User{}, err
 	}
 
+	logger.Info(query)
+
 	users := make([]dto.User, 0)
 
 	if err := r.db.SelectContext(ctx, &users, query, args...); err != nil {
@@ -196,6 +200,8 @@ func (r Repository) GetById(
 
 		return dto.User{}, err
 	}
+
+	logger.Info(query)
 
 	var user dto.User
 
@@ -259,10 +265,19 @@ func (r Repository) Update(
 		return 0, err
 	}
 
+	logger.Info(query)
+
 	var userID int
 
 	if err := r.db.GetContext(ctx, &userID, query, args...); err != nil {
 		logger.Warnf("error on update user: %s", err)
+
+		if errpkg.Is(err, sql.ErrNoRows) {
+			return 0, errors.
+				ErrNotFound.
+				New("user not found").
+				Wrap(err)
+		}
 
 		if e, ok := err.(*pq.Error); ok {
 			switch e.Code {
@@ -317,6 +332,8 @@ func (r Repository) Delete(
 
 		return 0, err
 	}
+
+	logger.Info(query)
 
 	var userID int
 

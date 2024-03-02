@@ -1,10 +1,13 @@
 package transport
 
 import (
+	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/gorilla/mux"
 	"github.com/jackvonhouse/enrichment/app/usecase"
+	"github.com/jackvonhouse/enrichment/internal/transport/graphql"
+	graphqlUser "github.com/jackvonhouse/enrichment/internal/transport/graphql/user"
+	httpUser "github.com/jackvonhouse/enrichment/internal/transport/http/user"
 	"github.com/jackvonhouse/enrichment/internal/transport/router"
-	"github.com/jackvonhouse/enrichment/internal/transport/user"
 	"github.com/jackvonhouse/enrichment/pkg/log"
 )
 
@@ -22,8 +25,20 @@ func New(
 	r := router.New("/api/v1")
 
 	r.Handle(map[string]router.Handlify{
-		"/user": user.New(useCase.User, transportLogger),
+		"/user": httpUser.New(useCase.User, transportLogger),
 	})
+
+	h := graphqlUser.New(useCase.User, transportLogger)
+
+	srv := handler.NewDefaultServer(
+		graphql.NewExecutableSchema(
+			graphql.Config{
+				Resolvers: &h,
+			},
+		),
+	)
+
+	r.Router().Handle("/graphql/user", srv)
 
 	return Transport{
 		router: r,

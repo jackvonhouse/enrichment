@@ -36,7 +36,7 @@ func New(
 
 	return Transport{
 		useCase: useCase,
-		logger:  logger.WithField("layer", "transport"),
+		logger:  logger.WithField("transport_type", "http"),
 	}
 }
 

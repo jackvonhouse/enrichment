@@ -1,0 +1,230 @@
+{
+	"info": {
+		"_postman_id": "6670be87-7498-4e30-89cd-a752f775201e",
+		"name": "Enrichment",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "31426554"
+	},
+	"item": [
+		{
+			"name": "HTTP API",
+			"item": [
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Дмитрий\",\n    \"surname\": \"Ушаков\",\n    \"patronymic\": \"Васильевич\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{api}}/user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{api}}/user?name=D",
+							"host": [
+								"{{api}}"
+							],
+							"path": [
+								"user"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "D"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by id",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": "{{api}}/user/1111"
+					},
+					"response": []
+				},
+				{
+					"name": "Update user",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ivan\",\n    \"surname\": \"Ivanov\",\n    \"patronymic\": \"Ivanovich\",\n    \"age\": 21,\n    \"gender\": \"male\",\n    \"country\": \"RU\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": "{{api}}/user/1"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": "{{api}}/user/1"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "GraphQL API",
+			"item": [
+				{
+					"name": "Create user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  create(input: {\n    name: \"John\",\n    surname: \"Doe\"\n  })\n}",
+								"variables": ""
+							}
+						},
+						"url": "{{graphql}}/user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get users",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  get {\n    id\n    name\n    surname\n    patronymic\n    age\n    country\n    gender\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": "{{graphql}}/user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get user with filters",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  get(get: {limit: 25}, filter: {age: 31, ageSort: \"gt\"}, sort: {sortBy: \"name\", sortOrder: \"desc\"}) {\n    id\n    name\n    surname\n    patronymic\n    age\n    country\n    gender\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": "{{graphql}}/user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get user by id",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "query {\n  getById(id: 1) {\n    id\n    name\n    surname\n    patronymic\n    age\n    gender\n    country\n  }\n}",
+								"variables": ""
+							}
+						},
+						"url": "{{graphql}}/user"
+					},
+					"response": []
+				},
+				{
+					"name": "Update user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  update(input: {\n    id: 123,\n    name: \"Ivan\",\n    surname: \"Ivanov\",\n    patronymic: \"Ivanovich\",\n    age: 31,\n    country: \"CA\",\n    gender: \"Female\"\n  })\n}",
+								"variables": ""
+							}
+						},
+						"url": "{{graphql}}/user"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete user",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "graphql",
+							"graphql": {
+								"query": "mutation {\n  delete(id: 123)\n}",
+								"variables": ""
+							}
+						},
+						"url": "{{graphql}}/user"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": " http://localhost:8081",
+			"type": "string"
+		},
+		{
+			"key": "api",
+			"value": "{{host}}/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "graphql",
+			"value": "{{api}}/graphql",
+			"type": "string"
+		}
+	]
+}

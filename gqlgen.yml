@@ -1,0 +1,35 @@
+schema: api/graphql/schema/*.graphql
+
+exec:
+  layout: follow-schema
+  dir: internal/transport/graphql
+  package: graphql
+
+model:
+  filename: internal/transport/graphql/models/models_gen.go
+
+resolver:
+  layout: follow-schema
+  dir: internal/transport/graphql/user
+  package: user
+  filename_template: "{name}.resolvers.go"
+
+omit_slice_element_pointers: true
+struct_fields_always_pointers: false
+resolvers_always_return_pointers: false
+
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.ID
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+      - github.com/99designs/gqlgen/graphql.Int32
+  Int:
+    model:
+      - github.com/99designs/gqlgen/graphql.Int
+      - github.com/99designs/gqlgen/graphql.Int64
+      - github.com/99designs/gqlgen/graphql.Int32
+  String:
+    model:
+      - github.com/99designs/gqlgen/graphql.String

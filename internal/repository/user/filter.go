@@ -33,7 +33,7 @@ func (r Repository) whereName(
 
 	return builder.Where(
 		sq.Like{
-			"name": fmt.Sprintf("%%%s%%", strings.ToLower(name)),
+			"name": fmt.Sprintf("%%%s%%", name),
 		},
 	)
 }
@@ -48,7 +48,7 @@ func (r Repository) whereSurname(
 
 	return builder.Where(
 		sq.Like{
-			"surname": fmt.Sprintf("%%%s%%", strings.ToLower(surname)),
+			"surname": fmt.Sprintf("%%%s%%", surname),
 		},
 	)
 }
@@ -64,7 +64,7 @@ func (r Repository) wherePatronymic(
 
 	return builder.Where(
 		sq.Like{
-			"patronymic": fmt.Sprintf("%%%s%%", strings.ToLower(patronymic)),
+			"patronymic": fmt.Sprintf("%%%s%%", patronymic),
 		},
 	)
 }
@@ -74,10 +74,6 @@ func (r Repository) whereAge(
 	age int,
 	sortParam string,
 ) sq.SelectBuilder {
-
-	if age <= 0 {
-		return builder
-	}
 
 	switch sortParam {
 	case "eq":
